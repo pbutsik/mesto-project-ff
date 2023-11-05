@@ -1,3 +1,6 @@
+import "./pages/index.css"
+import { initialCards } from "./cards.js"
+
 const page = document.querySelector(".page");
 const cardContainer = page.querySelector(".places__list");
 const cardTemplate = document.querySelector("#card-template").content;
@@ -44,8 +47,8 @@ function deleteCard(btn = null) {
 
 function addCard(...args) {
   // добавляет в DOM карточку
-  cardElement = createCard(args[0], args[1]);
-  cardContainer.append(cardElement);
+  let cardElements = createCard(args[0], args[1]);
+  cardContainer.append(cardElements);
 }
 
 function main() {
