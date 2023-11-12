@@ -43,7 +43,6 @@ function closeX(evt) {
   closeModal(targetPopup);
 }
 
-
 function OpenImage(evt) {
   cardImage.src = evt.target["src"];
   cardCaption.textContent = evt.target["alt"];
@@ -67,7 +66,7 @@ function handleAddCard(evt) {
     name: cardFormName.value,
     link: cardFormLink.value,
   };
-  updateCardInitDict([Data])
+  updateCardInitDict([Data]);
   addCard(Data, deleteCard, likeCard, OpenImage);
 
   closeModal(cardAddPopup);
@@ -107,5 +106,3 @@ function main() {
 }
 
 main();
-
-
