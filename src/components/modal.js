@@ -1,10 +1,7 @@
-export { openModal, closeModal };
-
-let state;
 const timeout = 350;
 
 
-function smoothnessOpenClose(popup, state = null) {
+function smoothnessOpenClose(popup, state) {
   // плавное открытие и закрытие
   popup.classList.add("popup_is-animated");
 
@@ -24,14 +21,14 @@ function smoothnessOpenClose(popup, state = null) {
 
 function openModal(popup) {
   // открытие модальных окон
-  smoothnessOpenClose(popup, (state = "open"));
+  smoothnessOpenClose(popup, "open");
   document.addEventListener("keydown", closePressEcs);
   document.addEventListener("mousedown", closePressOverlay);
 }
 
 function closeModal(popup) {
   // закрытие модальных окон
-  smoothnessOpenClose(popup, (state = "close"));
+  smoothnessOpenClose(popup, "close");
   document.removeEventListener("keydown", closePressEcs);
   document.removeEventListener("mousedown", closePressOverlay);
 }
@@ -46,6 +43,8 @@ function closePressEcs(evt) {
 function closePressOverlay(evt) {
   // закрытие по нажатию на оверлей
   if (evt.target.classList.contains("popup_is-opened")) {
-    closeModal(document.querySelector(".popup_is-opened"));
+    closeModal(evt.target);  
   }
 }
+
+export { openModal, closeModal };

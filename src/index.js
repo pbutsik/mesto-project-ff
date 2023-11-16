@@ -1,7 +1,6 @@
 import "./pages/index.css";
 import { initialCards } from "./components/cards.js";
 import {
-  updateCardInitDict,
   createCard,
   deleteCard,
   likeCard,
@@ -30,13 +29,13 @@ const existingCardPopup = document.querySelector(".popup_type_image");
 const cardImage = existingCardPopup.querySelector(".popup__image");
 const cardCaption = existingCardPopup.querySelector(".popup__caption");
 
-function addCard(...args) {
+function addCard(cardsData) {
   // добавляет в DOM карточку
-  let cardElements = createCard(args[0], args[1], args[2], args[3]);
-  cardContainer.append(cardElements);
+  const cardElements = createCard(cardsData, deleteCard, likeCard, OpenImage);
+  cardContainer.prepend(cardElements);
 }
 
-function closeX(evt) {
+function closeBtnX(evt) {
   // закрытие по X
   const targetPopup = evt.target.closest(".popup");
 
@@ -45,11 +44,12 @@ function closeX(evt) {
 
 function OpenImage(evt) {
   cardImage.src = evt.target["src"];
+  cardImage.alt = evt.target["alt"];
   cardCaption.textContent = evt.target["alt"];
   openModal(existingCardPopup);
 }
 
-function handleFormSubmit(evt) {
+function handleEditProfileFormSubmit(evt) {
   // Редактирование имени и информации о себе
   evt.preventDefault();
   profileTitle.textContent = FormName.value;
@@ -62,47 +62,43 @@ function handleAddCard(evt) {
   // Добавление карточки
   evt.preventDefault();
 
-  const Data = {
+  const data = {
     name: cardFormName.value,
     link: cardFormLink.value,
   };
-  updateCardInitDict([Data]);
-  addCard(Data, deleteCard, likeCard, OpenImage);
+  addCard(data);
 
   closeModal(cardAddPopup);
 }
 
-function main() {
-  // основная функция
-
-  // вывод карточек
-  for (let item of updateCardInitDict(initialCards)) {
-    addCard(item, deleteCard, likeCard, OpenImage);
-  }
-
-  //открытие попапов
-  cardBtn.addEventListener("click", () => {
-    cardForm.reset();
-    openModal(cardAddPopup);
-  });
-
-  //открытие попапов
-  profileBtn.addEventListener("click", () => {
-    FormName.value = profileTitle.textContent;
-    FormProfession.value = profileDescription.textContent;
-    openModal(profilePopup);
-  });
-
-  // закрытие по X
-  for (let btn of allBtnsList) {
-    btn.addEventListener("click", closeX);
-  }
-
-  // Редактирование имени и информации о себе
-  profileForm.addEventListener("submit", handleFormSubmit);
-
-  // Добавление карточки
-  cardForm.addEventListener("submit", handleAddCard);
+// ___________________________________________________________________________________
+// вывод карточек
+for (let item of initialCards) {
+  addCard(item, deleteCard, likeCard, OpenImage);
 }
 
-main();
+//открытие попапов
+cardBtn.addEventListener("click", () => {
+  cardForm.reset();
+  openModal(cardAddPopup);
+});
+
+//открытие попапов
+profileBtn.addEventListener("click", () => {
+  FormName.value = profileTitle.textContent;
+  FormProfession.value = profileDescription.textContent;
+  openModal(profilePopup);
+});
+
+// закрытие по X
+for (let btn of allBtnsList) {
+  btn.addEventListener("click", closeBtnX);
+}
+
+// Редактирование имени и информации о себе
+profileForm.addEventListener("submit", handleEditProfileFormSubmit);
+
+// Добавление карточки
+cardForm.addEventListener("submit", handleAddCard);
+
+// ___________________________________________________________________________________
