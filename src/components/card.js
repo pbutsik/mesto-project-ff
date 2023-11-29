@@ -1,7 +1,7 @@
 const cardTemplate = document.querySelector("#card-template").content;
 
 
-  function createCard(card, deleteCardHandler, likeCardHandler, PopupHandler) {
+  function createCard(card, deleteCardHandler, likeCardHandler, openPopupHandler) {
     // создание и наполнение карточки
     const cardElement = cardTemplate.querySelector(".card").cloneNode(true);
   
@@ -26,7 +26,7 @@ const cardTemplate = document.querySelector("#card-template").content;
         evt.stopPropagation();
       });
 
-    cardElement.addEventListener('click', PopupHandler);
+    cardElement.addEventListener('click', openPopupHandler);
   
     return cardElement;
   }

@@ -6,6 +6,9 @@ import {
   likeCard,
 } from "./components/card.js";
 import { openModal, closeModal } from "./components/modal.js";
+import {
+  enableValidation,
+  clearValidation} from './components/validation.js';
 
 const page = document.querySelector(".page");
 const cardContainer = page.querySelector(".places__list");
@@ -20,14 +23,23 @@ const cardFormLink = cardForm.elements.link;
 const profilePopup = document.querySelector(".popup_type_edit");
 const profileBtn = document.querySelector(".profile__edit-button");
 const profileForm = document.forms["edit-profile"];
-const FormName = profileForm.elements.name;
-const FormProfession = profileForm.elements.description;
+const formName = profileForm.elements.name;
+const formProfession = profileForm.elements.description;
 const profileTitle = document.querySelector(".profile__title");
 const profileDescription = document.querySelector(".profile__description");
 
 const existingCardPopup = document.querySelector(".popup_type_image");
 const cardImage = existingCardPopup.querySelector(".popup__image");
 const cardCaption = existingCardPopup.querySelector(".popup__caption");
+
+const validationConfig = {
+  formSelector: '.popup__form',
+  inputSelector: '.popup__input',
+  submitButtonSelector: '.popup__button',
+  inactiveButtonClass: 'popup__button_disabled',
+  inputErrorClass: 'popup__input_type_error',
+  errorClass: 'popup__error_visible'
+}
 
 function addCard(cardsData) {
   // добавляет в DOM карточку
@@ -52,8 +64,8 @@ function OpenImage(evt) {
 function handleEditProfileFormSubmit(evt) {
   // Редактирование имени и информации о себе
   evt.preventDefault();
-  profileTitle.textContent = FormName.value;
-  profileDescription.textContent = FormProfession.value;
+  profileTitle.textContent = formName.value;
+  profileDescription.textContent = formProfession.value;
 
   closeModal(profilePopup);
 }
@@ -81,13 +93,15 @@ for (let item of initialCards) {
 cardBtn.addEventListener("click", () => {
   cardForm.reset();
   openModal(cardAddPopup);
+  clearValidation(cardForm, validationConfig);
 });
 
 //открытие попапов
 profileBtn.addEventListener("click", () => {
-  FormName.value = profileTitle.textContent;
-  FormProfession.value = profileDescription.textContent;
+  formName.value = profileTitle.textContent;
+  formProfession.value = profileDescription.textContent;
   openModal(profilePopup);
+  clearValidation(profileForm, validationConfig);
 });
 
 // закрытие по X
@@ -102,3 +116,5 @@ profileForm.addEventListener("submit", handleEditProfileFormSubmit);
 cardForm.addEventListener("submit", handleAddCard);
 
 // ___________________________________________________________________________________
+
+enableValidation(validationConfig);
