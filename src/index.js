@@ -9,6 +9,11 @@ import { openModal, closeModal } from "./components/modal.js";
 import {
   enableValidation,
   clearValidation} from './components/validation.js';
+import {
+    getAllCards,
+    getUserProfile,
+    updateUserProfile,
+    postCard,} from './components/api.js';
 
 const page = document.querySelector(".page");
 const cardContainer = page.querySelector(".places__list");
@@ -27,12 +32,13 @@ const formName = profileForm.elements.name;
 const formProfession = profileForm.elements.description;
 const profileTitle = document.querySelector(".profile__title");
 const profileDescription = document.querySelector(".profile__description");
+const profileImage = document.querySelector('.profile__image');
 
 const existingCardPopup = document.querySelector(".popup_type_image");
 const cardImage = existingCardPopup.querySelector(".popup__image");
 const cardCaption = existingCardPopup.querySelector(".popup__caption");
 
-const validationConfig = {
+const validationCredentials= {
   formSelector: '.popup__form',
   inputSelector: '.popup__input',
   submitButtonSelector: '.popup__button',
@@ -41,11 +47,9 @@ const validationConfig = {
   errorClass: 'popup__error_visible'
 }
 
-function addCard(cardsData) {
-  // добавляет в DOM карточку
-  const cardElements = createCard(cardsData, deleteCard, likeCard, OpenImage);
-  cardContainer.prepend(cardElements);
-}
+
+
+
 
 function closeBtnX(evt) {
   // закрытие по X
@@ -54,21 +58,103 @@ function closeBtnX(evt) {
   closeModal(targetPopup);
 }
 
-function OpenImage(evt) {
+function openImage(evt) {
   cardImage.src = evt.target["src"];
   cardImage.alt = evt.target["alt"];
   cardCaption.textContent = evt.target["alt"];
   openModal(existingCardPopup);
 }
 
+
+
+
+
+// ___________________________________________________________________________________
+// вывод карточек
+// for (let item of initialCards) {
+//   addCard(item, deleteCard, likeCard, openImage);
+// }
+
+
+
+
+
+// закрытие по X
+for (let btn of allBtnsList) {
+  btn.addEventListener("click", closeBtnX);
+}
+
+
+
+
+
+// ___________________________________________________________________________________
+
+
+let selfId = '';
+const promises = [getAllCards, getUserProfile];
+
+function addCard(cardsData) {
+  // добавляет в DOM карточку
+  const cardElements = createCard(cardsData, deleteCard, likeCard, openImage);
+  cardContainer.prepend(cardElements);
+}
+
+
+Promise.all(promises)
+// вывод данных с сервера (карточки и инфа о профиле)
+.then(() => {
+
+  console.log(getAllCards())
+
+  getAllCards()
+  .then(data => {
+    data.forEach( (card) => {addCard(card, cardContainer)} )
+  })
+  .catch((err) => {
+    console.log(`getAllCards - ${err}`); // выводим ошибку в консоль
+  }); 
+
+  console.log(getUserProfile())
+  getUserProfile()
+  .then((data) => {
+    selfId = data._id;
+    profileTitle.textContent = data.name;
+    profileDescription.textContent = data.about;
+    profileImage.style.backgroundImage = `url('${data.avatar}')`;
+    console.log(data.avatar)
+  })
+  .catch((err) => {
+    console.log(`getUserProfile - ${err}`);
+  }); 
+
+})
+
 function handleEditProfileFormSubmit(evt) {
   // Редактирование имени и информации о себе
   evt.preventDefault();
-  profileTitle.textContent = formName.value;
-  profileDescription.textContent = formProfession.value;
 
-  closeModal(profilePopup);
+  updateUserProfile(formName.value, formProfession.value)
+  .then((data) => {
+    profileTitle.textContent = data.name;
+    profileDescription.textContent = data.about;
+    closeModal(profilePopup);
+  })
+  .catch((err) => {
+    console.log(`updateUserProfile - ${err}`);
+  }); 
 }
+
+//открытие попапа
+profileBtn.addEventListener("click", () => {
+  formName.value = profileTitle.textContent;
+  formProfession.value = profileDescription.textContent;
+  openModal(profilePopup);
+  clearValidation(profileForm, validationCredentials);
+});
+
+// Редактирование имени и информации о себе
+profileForm.addEventListener("submit", handleEditProfileFormSubmit);
 
 function handleAddCard(evt) {
   // Добавление карточки
@@ -78,43 +164,26 @@ function handleAddCard(evt) {
     name: cardFormName.value,
     link: cardFormLink.value,
   };
-  addCard(data);
+  postCard(data.name, data.link)
+  .then((itemData) => {
+    addCard(itemData);
+    closeModal(cardAddPopup);
 
-  closeModal(cardAddPopup);
+  })
+  .catch((err) => {
+    console.log(`postCard - ${err}`);
+  }); 
+  
 }
 
-// ___________________________________________________________________________________
-// вывод карточек
-for (let item of initialCards) {
-  addCard(item, deleteCard, likeCard, OpenImage);
-}
-
-//открытие попапов
+//открытие попапа
 cardBtn.addEventListener("click", () => {
   cardForm.reset();
   openModal(cardAddPopup);
-  clearValidation(cardForm, validationConfig);
+  clearValidation(cardForm, validationCredentials);
 });
-
-//открытие попапов
-profileBtn.addEventListener("click", () => {
-  formName.value = profileTitle.textContent;
-  formProfession.value = profileDescription.textContent;
-  openModal(profilePopup);
-  clearValidation(profileForm, validationConfig);
-});
-
-// закрытие по X
-for (let btn of allBtnsList) {
-  btn.addEventListener("click", closeBtnX);
-}
-
-// Редактирование имени и информации о себе
-profileForm.addEventListener("submit", handleEditProfileFormSubmit);
 
 // Добавление карточки
 cardForm.addEventListener("submit", handleAddCard);
 
-// ___________________________________________________________________________________
-
-enableValidation(validationConfig);
+enableValidation(validationCredentials);
