@@ -37,8 +37,8 @@ function checkInputValidity(
   }
 
   if (!inputElement.validity.valid) {
-    console.log(inputElement)
-    console.log(inputElement.validationMessage)
+    // console.log(inputElement)
+    // console.log(inputElement.validationMessage)
     showInputError(
       formElement,
       inputElement,

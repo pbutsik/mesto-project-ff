@@ -1,5 +1,4 @@
 import "./pages/index.css";
-import { initialCards } from "./components/cards.js";
 import {
   createCard,
   deleteCard,
@@ -13,7 +12,8 @@ import {
     getAllCards,
     getUserProfile,
     updateUserProfile,
-    postCard,} from './components/api.js';
+    postCard,
+    editAvatar } from './components/api.js';
 
 const page = document.querySelector(".page");
 const cardContainer = page.querySelector(".places__list");
@@ -38,6 +38,13 @@ const existingCardPopup = document.querySelector(".popup_type_image");
 const cardImage = existingCardPopup.querySelector(".popup__image");
 const cardCaption = existingCardPopup.querySelector(".popup__caption");
 
+const avatarPopup = document.querySelector('.popup_type_edit-avatar');
+const avatarForm = document.forms['edit-avatar'];
+const avatarFormInput = avatarForm.elements.url;
+const avatarButton = document.querySelector('.profile__image-edit');
+const avatarFormButton = avatarForm.querySelector('.popup__button');
+
+
 const validationCredentials= {
   formSelector: '.popup__form',
   inputSelector: '.popup__input',
@@ -47,9 +54,8 @@ const validationCredentials= {
   errorClass: 'popup__error_visible'
 }
 
-
-
-
+let selfId = '';
+const promises = [getAllCards, getUserProfile];
 
 function closeBtnX(evt) {
   // закрытие по X
@@ -65,38 +71,15 @@ function openImage(evt) {
   openModal(existingCardPopup);
 }
 
-
-
-
-
-// ___________________________________________________________________________________
-// вывод карточек
-// for (let item of initialCards) {
-//   addCard(item, deleteCard, likeCard, openImage);
-// }
-
-
-
-
-
 // закрытие по X
 for (let btn of allBtnsList) {
   btn.addEventListener("click", closeBtnX);
 }
 
 
-
-
-
-// ___________________________________________________________________________________
-
-
-let selfId = '';
-const promises = [getAllCards, getUserProfile];
-
 function addCard(cardsData) {
   // добавляет в DOM карточку
-  const cardElements = createCard(cardsData, deleteCard, likeCard, openImage);
+  const cardElements = createCard(cardsData, deleteCard, likeCard, openImage, selfId);
   cardContainer.prepend(cardElements);
 }
 
@@ -109,23 +92,25 @@ Promise.all(promises)
 
   getAllCards()
   .then(data => {
-    data.forEach( (card) => {addCard(card, cardContainer)} )
+    data.forEach( (card) => {addCard(card)} )
   })
   .catch((err) => {
-    console.log(`getAllCards - ${err}`); // выводим ошибку в консоль
+    console.log(`${getAllCards.name} - ${err}`); // выводим ошибку в консоль
   }); 
 
   console.log(getUserProfile())
   getUserProfile()
   .then((data) => {
     selfId = data._id;
+    console.log(selfId)
+
     profileTitle.textContent = data.name;
     profileDescription.textContent = data.about;
     profileImage.style.backgroundImage = `url('${data.avatar}')`;
     console.log(data.avatar)
   })
   .catch((err) => {
-    console.log(`getUserProfile - ${err}`);
+    console.log(`${getUserProfile.name} - ${err}`);
   }); 
 
 })
@@ -141,7 +126,7 @@ function handleEditProfileFormSubmit(evt) {
     closeModal(profilePopup);
   })
   .catch((err) => {
-    console.log(`updateUserProfile - ${err}`);
+    console.log(`${updateUserProfile.name} - ${err}`);
   }); 
 }
 
@@ -171,7 +156,7 @@ function handleAddCard(evt) {
 
   })
   .catch((err) => {
-    console.log(`postCard - ${err}`);
+    console.log(`${postCard.name} - ${err}`);
   }); 
   
 }
@@ -185,5 +170,34 @@ cardBtn.addEventListener("click", () => {
 
 // Добавление карточки
 cardForm.addEventListener("submit", handleAddCard);
+
+function Avatar(evt) {
+  // изменение аватара
+  evt.preventDefault()
+
+  avatarFormButton.textContent = 'Сохранение...';
+
+  editAvatar(avatarFormInput.value)
+  .then((data) => {
+    profileImage.style.backgroundImage = `url('${data.avatar}')`;
+    closeModal(avatarPopup);
+  })
+  .catch((err) => {
+    console.log(`${Avatar.name} - ${err}`);
+  })
+  .finally(() => {
+    avatarFormButton.textContent = 'Сохранить';
+  });
+
+}
+
+avatarButton.addEventListener('click', () => {
+  avatarForm.reset();
+  clearValidation(avatarForm ,validationCredentials);
+  openModal(avatarPopup);
+})
+
+// редактирование аватара
+avatarForm.addEventListener('submit', Avatar);
 
 enableValidation(validationCredentials);
