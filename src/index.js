@@ -82,35 +82,6 @@ function addCard(cardsData) {
   cardContainer.prepend(cardElements);
 }
 
-// Promise.all(promises)
-//   // вывод данных с сервера (карточки и инфа о профиле)
-//   .then(() => {
-
-//     getAllCards()
-//       .then((data) => {
-//         data.forEach((card) => {
-//           addCard(card);
-//         });
-//       })
-//       .catch((err) => {
-//         console.log(`${getAllCards.name} - ${err}`); // выводим ошибку в консоль
-//       });
-
-//     getUserProfile()
-//       .then((data) => {
-//         selfId = data._id;
-//         console.log(selfId);
-
-//         profileTitle.textContent = data.name;
-//         profileDescription.textContent = data.about;
-//         profileImage.style.backgroundImage = `url('${data.avatar}')`;
-//         console.log(data.avatar);
-//       })
-//       .catch((err) => {
-//         console.log(`${getUserProfile.name} - ${err}`);
-//       });
-//   });
-
 Promise.all(promises)
   // вывод данных с сервера (карточки и инфа о профиле)
   .then((data) => {
@@ -121,9 +92,11 @@ Promise.all(promises)
 
     data[0].forEach((card) => {
       addCard(card);
-    });
-
-});
+    })
+  })
+  .catch((err) => {
+    console.log(err);
+  })
 
 function handleEditProfileFormSubmit(evt) {
   // Редактирование имени и информации о себе
