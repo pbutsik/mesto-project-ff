@@ -6,7 +6,7 @@ const apiCredentials = {
   },
 };
 
-function srvResponse(res) {
+function checkServerResponse(res) {
   if (res.ok) {
     return res.json();
   }
@@ -18,13 +18,13 @@ function srvResponse(res) {
 function getAllCards() {
   return fetch(`${apiCredentials.mesto_url}/cards`, {
     headers: apiCredentials.headers,
-  }).then(srvResponse);
+  }).then(checkServerResponse);
 }
 
 function getUserProfile() {
   return fetch(`${apiCredentials.mesto_url}/users/me`, {
     headers: apiCredentials.headers,
-  }).then(srvResponse);
+  }).then(checkServerResponse);
 }
 // GET
 
@@ -37,7 +37,7 @@ function postCard(name, link) {
       name: name,
       link: link,
     }),
-  }).then(srvResponse);
+  }).then(checkServerResponse);
 }
 // POST
 
@@ -50,19 +50,18 @@ function updateUserProfile(name, info) {
       name: name,
       about: info,
     }),
-  }).then(srvResponse);
-
+  }).then(checkServerResponse);
 }
 
-function editAvatar(url){
+function editAvatar(url) {
   return fetch(`${apiCredentials.mesto_url}/users/me/avatar`, {
     method: "PATCH",
     headers: apiCredentials.headers,
     body: JSON.stringify({
       avatar: url,
     }),
-  }).then(srvResponse);
-};
+  }).then(checkServerResponse);
+}
 // PATCH
 
 // PUT
@@ -70,7 +69,7 @@ function like(id) {
   return fetch(`${apiCredentials.mesto_url}/cards/likes/${id}`, {
     method: "PUT",
     headers: apiCredentials.headers,
-  }).then(srvResponse);
+  }).then(checkServerResponse);
 }
 // PUT
 
@@ -79,14 +78,14 @@ function disLike(id) {
   return fetch(`${apiCredentials.mesto_url}/cards/likes/${id}`, {
     method: "DELETE",
     headers: apiCredentials.headers,
-  }).then(srvResponse);
+  }).then(checkServerResponse);
 }
 
 function apiDeleteCard(id) {
   return fetch(`${apiCredentials.mesto_url}/cards/${id}`, {
     method: "DELETE",
     headers: apiCredentials.headers,
-  }).then(srvResponse);
+  }).then(checkServerResponse);
 }
 // DELETE
 
@@ -98,5 +97,5 @@ export {
   like,
   disLike,
   apiDeleteCard,
-  editAvatar
+  editAvatar,
 };
